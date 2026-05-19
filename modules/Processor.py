@@ -38,9 +38,5 @@ class Data:
         phase = np.angle(fourierData)
         freq = np.fft.fftfreq(size,1/self.__freq)
 
-        func = lambda x,A,f,phi : A*np.cos(2*np.pi*f*x+phi)
-        y = lambda x : sum(map(func, [x]*size, amplitude, freq, phase))
-
-        return y
-
+        return amplitude
 
