@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.signal import butter, filtfilt
 
-signal = np.random.rand(1000)  # Example signal
+#signal = np.random.rand(1000)  # Example signal
 
 # making a trial waveform for testing 
 f = 440
@@ -113,7 +113,17 @@ def add_sinusoidal_interference(freq=1000, strength=0.3):
         return interfered_waveform
     return channel
 
- 
+
+def build_channel(*transforms):
+    def channel(waveform):
+        result = waveform
+        for transform in transforms:
+            result = transform(result)
+        return result
+    return channel
+
+
+"""
 def apply_channel(signal, fs, config): 
 
     s = signal.copy().astype(float)  # work on a copy, ensure float type 
@@ -143,3 +153,5 @@ def apply_channel(signal, fs, config):
         s = add_sinusoidal_interference(s, fs=fs, **config['interference']) 
 
     return s  
+"""
+
