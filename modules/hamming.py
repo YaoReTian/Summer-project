@@ -9,7 +9,7 @@ class Hamming:
     This can detect two bit errors and correct single bit errors.
     '''
     _gT = numpy.matrix([[1, 1, 0, 1], [1, 0, 1, 1], [1, 0, 0, 0], [
-        0, 1, 1, 1], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+        0, 1, 1, 1], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) # 
 
     _h = numpy.matrix(
         [[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]])
