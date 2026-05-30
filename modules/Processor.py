@@ -1,6 +1,7 @@
 # Signal Processing module
 
 import numpy as np
+from functools import lru_cache
 
 class Data:
     def __init__(self):
@@ -18,6 +19,12 @@ class Data:
     def setDataFromBytes(self, byteString):
         self.__data = list(byteString)
 
+    def setDataFromBin(self, binString):
+        self.__data = []
+        length = int(len(binString)/8)
+        for i in range(length):
+            self.__data.append(int(binString[i*8:i*8+8],2))
+
     def setDataFromIntList(self, intList):
         self.__data = intList
 
@@ -31,12 +38,52 @@ class Data:
         with open(fileName, "wb") as file:
             file.write(self.dataBytes())
 
-    def fftFunction(self):
-        size = len(self.__data)
-        fourierData = np.fft.fft(self.__data)
-        amplitude = np.abs(fourierData)
-        phase = np.angle(fourierData)
-        freq = np.fft.fftfreq(size,1/self.__freq)
+    def toBinaryStr(self):
+        lst = ""
+        for i in self.__data:
+            lst += format(i, "08b")
 
-        return amplitude
+        return lst
+
+    def bpskMod(self, freq=10e9, Tb=1e-7, Eb=40e-6):
+        binlst = self.toBinaryStr()
+
+        lst = np.array(list(binlst), dtype=int)
+
+        # Function for bpsk wave
+        A = np.sqrt(2*Eb/Tb)
+        omega = 2*np.pi*freq
+        signal = lambda t : A*np.cos(omega*t + np.pi*(1-lst[(t/Tb).astype(int)]))
+
+        return signal
+
+    @staticmethod
+    def bpskDemod(signal,freq=10e9, Tb=1e-7):
+
+        omega = 2*np.pi*freq
+        refSig = lambda t : np.cos(omega*t)
+
+        product = lambda t : signal(t) * refSig(t)
+
+        bits = ""
+        end = False
+        i = 0
+
+        while not end:
+            try:
+                print("Run no.", i)
+                tPoints = np.arange(i*Tb,(i+1)*Tb, 1/(freq))
+                integral = np.sum(product(tPoints))
+                if integral > 0:
+                    bits += "1"
+                else:
+                    bits += "0"
+                i+=1
+            except IndexError:
+                end = True
+                print("Reached end of data")
+
+
+
+        return bits
 
