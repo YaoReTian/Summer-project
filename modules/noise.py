@@ -44,6 +44,7 @@ def add_impulse_noise(prob=0.001, magnitude=5):
             signs = np.random.choice([-1, 1], size=t_arr.shape) # randomly choosing whether the impulse noise will be positive or negative
             return x + mask * signs * magnitude  
         return noisy_waveform
+    return channel
     
 def multipath(delays=[0.001, 0.002], attenuations=[0.5, 0.25]): 
     # note delays now in seconds, since we are dealing with waveforms, we will convert these to sample delays based on the sampling frequency when we apply the channel
@@ -53,7 +54,7 @@ def multipath(delays=[0.001, 0.002], attenuations=[0.5, 0.25]):
             result = signal.copy() # start with the original signal as the base of the result
             for delay, att in zip(delays, attenuations): 
                 result = result + att * waveform(t - delay) # add the delayed and attenuated version of the signal to the result to simulate the multipath effect
-                return result
+            return result
         return multipath_waveform
     return channel
 
