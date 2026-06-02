@@ -47,7 +47,6 @@ def add_impulse_noise(prob=0.001, magnitude=5):
             return x + mask * signs * magnitude
         return noisy_waveform
     return channel
-    return channel
 
 def multipath(delays=[0.001, 0.002], attenuations=[0.5, 0.25]):
     # note delays now in seconds, since we are dealing with waveforms, we will convert these to sample delays based on the sampling frequency when we apply the channel

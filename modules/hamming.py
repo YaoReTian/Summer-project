@@ -1,145 +1,63 @@
-# github: https://github.com/shakthisachintha/hamming-7-4-python/blob/main/hammingCode.py
-
-import numpy
+import numpy as np
 
 class Hamming:
-    '''
-    Hamming (7,4) error correction code implementation.
-    Can be used to encode, parity check, error correct, decode and get the orginal message back.
-    This can detect two bit errors and correct single bit errors.
-    '''
-    _gT = numpy.matrix([[1, 1, 0, 1], [1, 0, 1, 1], [1, 0, 0, 0], [
-        0, 1, 1, 1], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]) # 
+    _gT = np.matrix([
+        [0, 1, 1, 1],
+        [1, 0, 1, 1],
+        [1, 1, 0, 1],
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+    ])
 
-    _h = numpy.matrix(
-        [[1, 0, 1, 0, 1, 0, 1], [0, 1, 1, 0, 0, 1, 1], [0, 0, 0, 1, 1, 1, 1]])
+    _h = np.matrix([
+        [1, 0, 0, 0, 1, 1, 1],
+        [0, 1, 0, 1, 0, 1, 1],
+        [0, 0, 1, 1, 1, 0, 1]
+    ])
 
-    _R = numpy.matrix([[0, 0, 1, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0], [
-        0, 0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 0, 1]])
+G = np.array(Hamming._gT.T)   # (4x7) generator matrix
+H = np.array(Hamming._h)       # (3x7) parity-check matrix
 
-    
-    def _strToMat(self, binaryStr):
-        '''
-        @Input
-        Binary string of length 4
+# Recovery matrix — extracts the 4 data bits from positions 3,4,5,6
+R = np.array([
+    [0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 1]
+])
 
-        @Output
-        Numpy row vector of length 4
-        '''
+# encode
+d = np.array([1, 0, 1, 1])                        # original 4-bit message
+c = (np.dot(d, G) % 2).astype(int)                # encoded 7-bit codeword
+print("Original message:  ", d.tolist())
+print("Encoded codeword:  ", c.tolist())
 
-        inp = numpy.frombuffer(binaryStr.encode(), dtype=numpy.uint8)-ord('0')
-        return inp
+# 1 bit error introduced
+c_received = c.copy()
+c_received[2] ^= 1                                # flip bit at position 2
+print("Received codeword: ", c_received.tolist())
 
-    
-    def encode(self, message):
-        '''
-        @Input
-        String
-        Message is a 4 bit binary string
-        @Output
-        Numpy matrix column vector
-        Encoded 7 bit binary string
-        '''
-        message = numpy.matrix(self._strToMat(message)).transpose()
-        en = numpy.dot(self._gT, message) % 2
-        return en
+# syndrome calculation
+s = (np.dot(H, c_received.T) % 2).astype(int)
+print("Syndrome:          ", s.tolist())
 
-    
-    def parityCheck(self, message):
-        '''
-        @Input
-        Numpy matrix a column vector of length 7
-        Accepts a binary column vector
+# error detection and correction
+if s.tolist() == [0, 0, 0]:
+    print("No errors detected.")
+    corrected = c_received
+else:
+    # Convert syndrome from binary to integer to get error position
+    # s[0] is LSB, s[2] is MSB  →  position = s[0]*1 + s[1]*2 + s[2]*4
+    error_pos = int(s[0] * 1 + s[1] * 2 + s[2] * 4) - 1  # subtract 1 for 0-indexing
+    print(f"Error detected at bit position: {error_pos} (0-indexed)")
 
-        @Output
-        Numpy row vector of length 3
-        Returns the single bit error location as row vector
-        '''
-        z = numpy.dot(self._h, message) % 2
-        return numpy.fliplr(z.transpose())
+    corrected = c_received.copy()
+    corrected[error_pos-1] ^= 1                     # flip the erroneous bit back
+    print("Corrected codeword:", corrected.tolist())
 
-    
-    def getOriginalMessage(self, message):
-        '''
-        @Input
-        Numpy matrix a column vector of length 7
-        Accepts a binary column vector
-
-        @Output
-        List of length 4
-        Returns the single bit error location as row vector ()
-        '''
-        ep = self.parityCheck(message)
-        pos = self._binatodeci(ep)
-        if pos > 0:
-            correctMessage = self._flipbit(message, pos)
-        else:
-            correctMessage = message
-
-        origMessage = numpy.dot(self._R, correctMessage)
-        return origMessage.transpose().tolist()
-
-    
-    def _flipbit(self, enc, bitpos):
-        '''
-        @Input
-          enc:Numpy matrix a column vector of length 7
-          Accepts a binary column vector
-
-          bitpos: Integer value of the position to change
-          flip the bit. Value should be on range 1-7
-
-        @Output
-          Numpy matrix a column vector of length 7
-          Returns the bit flipped matrix
-        '''
-        enc = enc.transpose().tolist()
-        bitpos = bitpos - 1
-        if (enc[0][bitpos] == 1):
-            enc[0][bitpos] = 0
-        else:
-                enc[0][bitpos] = 1
-        return numpy.matrix(enc).transpose()
-
-    
-    def _binatodeci(self, binaryList):
-        '''
-        @Input
-        Numpy matrix column or row one dimension
-
-        @Output
-        Decimal number equal to the binary matrix
-        '''
-        return sum(val*(2**idx) for idx, val in enumerate(reversed(binaryList.tolist()[0])))
-
-
-
-
-
-
-
-#what if the message is larger than 4 bits? We can split it into chunks of 4 bits and encode each chunk separately.
-
-def encode_large(message: str, ham: Hamming):
-    # Pad message to multiple of 4
-    while len(message) % 4 != 0:
-        message = '0' + message
-    
-    chunks = [message[i:i+4] for i in range(0, len(message), 4)]
-    encoded_chunks = [ham.encode(chunk) for chunk in chunks]
-    return encoded_chunks
-
-
-def decode_large(encoded_chunks: list, ham: Hamming):
-    decoded = []
-    for chunk in encoded_chunks:
-        orig = ham.getOriginalMessage(chunk)
-        decoded.extend(orig[0])
-    return decoded
-
-
-if __name__ == "__main__":
-    ham = Hamming()
-    enc = ham.encode("1010")
-    orig = ham.getOriginalMessage(enc)
-    print(orig)
+# recover original message
+recovered_message = (np.dot(R, corrected.T) % 2).astype(int)
+print("Recovered message: ", recovered_message.tolist())
+print("Match:", np.array_equal(d, recovered_message))
