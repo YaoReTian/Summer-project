@@ -297,6 +297,12 @@ recovered_pixels = bits_to_ints(recovered_bits)
 recovered_array = recovered_pixels.reshape(original_shape)
 print(f"recovered_pixels: {recovered_array}...")
 # Save and display
+
+# Save and display
+with open("data.txt", "w") as file:
+    file.write(recovered_array)
+    
+
 print("Equal arrays:", np.array_equal(img_array, recovered_array))
 recovered_array = recovered_array.astype(np.uint8)
 corrupted_img = Image.fromarray(recovered_array, mode="RGB")
