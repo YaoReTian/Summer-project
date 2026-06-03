@@ -283,7 +283,7 @@ recovered_pixels = bits_to_ints(recovered_bits)
 
 
 # Reshape to original image dimensions
-recovered_array = original_signal.reshape(original_shape)
+recovered_array = recovered_pixels.reshape(original_shape)
 
 # Save and display
 corrupted_img = Image.fromarray(recovered_array, mode="RGB")
