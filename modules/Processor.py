@@ -83,7 +83,5 @@ class Data:
                 end = True
                 print("Reached end of data")
 
-
-
         return bits
 
