@@ -48,7 +48,7 @@ for i in impTM:
     channel = noise.add_impulse_noise(prob=0.5,magnitude=i)
     BerTM.append(getBERof(channel))
 
-headTM = "impulse magnitude, BER"
+headTM = "impulse_magnitude, BER"
 resTM = np.array([impTM, BerTM]).transpose()
 np.savetxt("impulse_magnitude.csv", resTM,delimiter=',',header=headTM, comments='')
 
@@ -56,12 +56,12 @@ np.savetxt("impulse_magnitude.csv", resTM,delimiter=',',header=headTM, comments=
 attT = np.linspace(0,1,100)
 BerAtt = []
 for i in attT:
-    channel = noise.multipath(delays=[0.001, 0.002], attenutations =[i,i])
+    channel = noise.multipath(delays=[0.001, 0.002], attenuations=[i,i])
     BerAtt.append(getBERof(channel))
 
-headAtt = "multipath attenutations, BER"
+headAtt = "multipath_attenuations, BER"
 resAtt = np.array([attT, BerAtt]).transpose()
-np.savetxt("impulse_magnitude.csv", resAtt,delimiter=',',header=headAtt, comments='')
+np.savetxt("multipath_attenuations.csv", resAtt,delimiter=',',header=headAtt, comments='')
 
 # awgn
 snrT = np.linspace(0.001, 10, 100)
@@ -70,9 +70,9 @@ for i in snrT:
     channel = noise.add_awgn(i)
     BerSnr.append(getBERof(channel))
 
-headSnr = "awgn snr, BER"
+headSnr = "awgn_snr, BER"
 resSnr = np.array([snrT, BerSnr]).transpose()
-np.savetxt("impulse_magnitude.csv", resSnr,delimiter=',',header=headSnr, comments='')
+np.savetxt("awgn.csv", resSnr,delimiter=',',header=headSnr, comments='')
 
 # sin
 sinT = np.linspace(0.1,1000,100)
@@ -81,9 +81,9 @@ for i in sinT:
     channel = noise.add_sinusoidal_interference(freq=1e10, strength=i)
     BerSin.append(getBERof(channel))
 
-headSin = "sinusoidal strength, BER"
+headSin = "sinusoidal_strength, BER"
 resSin = np.array([impSin, BerSin]).transpose()
-np.savetxt("impulse_magnitude.csv", resSin,delimiter=',',header=headSin, comments='')
+np.savetxt("sin_strength.csv", resSin,delimiter=',',header=headSin, comments='')
 
 
 
