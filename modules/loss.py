@@ -72,3 +72,6 @@ def stuctural_sim(img1, img2,channel_axis=2,data_range=255):
 
 def mse(x, y): 
     return np.mean((x - y)**2) 
+
+def PSNR(x, y): 
+    return 10 * np.log10(1 / mse(x, y))
