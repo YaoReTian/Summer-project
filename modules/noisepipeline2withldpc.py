@@ -173,7 +173,7 @@ def ldpc_encode(arr,G,k=904,return_blocks=False):
 
 
 
-img = Image.open('Reimu Hakurei.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
+img = Image.open('JamesWebbImage1.jpg.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
 img_array = np.array(img, dtype=int) 
 original_shape = img_array.shape # store original shape for later
 original_signal = img_array.flatten() # flatten the 3D image array to a 1D signal for processing
@@ -307,4 +307,4 @@ print("Equal arrays:", np.array_equal(img_array, recovered_array))
 recovered_array = recovered_array.astype(np.uint8)
 corrupted_img = Image.fromarray(recovered_array, mode="RGB")
 corrupted_img.save("corrupted_analogue.png")
-corrupted_img.show()
+
