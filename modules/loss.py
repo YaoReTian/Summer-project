@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn 
+from skimage.metrics import structural_similarity as ssim
 """
 #soft max function for normalisation 
 def softmax(x):
@@ -66,3 +67,8 @@ def ber(bits1, bits2):
 # b = np.array([0, 0, 1, 1, 1])
 
 # print("BER loss",ber(a, b))  # 0.4
+def stuctural_sim(img1, img2,channel_axis=2,data_range=255):
+    return ssim(img1, img2, channel_axis,data_range)
+
+def mse(x, y): 
+    return np.mean((x - y)**2) 
