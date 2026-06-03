@@ -4,6 +4,11 @@ import noise
 import os
 import matplotlib.pyplot as plt
 
+Var = Data()
+Var.setDataFromFile("crippling inkperial.jpg")
+sigData = Var.toBinaryStr()
+signal = Var.bpskMod()
+
 def BER(sig, rec):
     sigData = np.array(list(sig),int)
     recData = np.array(list(rec), int)
@@ -14,12 +19,18 @@ def BER(sig, rec):
     print("BER:",totErr/len(sigData))
     return ber
 
+def getBERof(channel):
+    signal_after_channel = channel(signal)
 
+    receivedData = Data.bpskDemod(signal_after_channel)
 
-Var = Data()
-Var.setDataFromFile("crippling inkperial.jpg")
-sigData = Var.toBinaryStr()
-signal = Var.bpskMod()
+    img = Data()
+    img.setDataFromBin(receivedData)
+
+    r = img.toBinaryStr()
+    k = BER(sigData,r)
+
+    return k
 
 """
 channel = noise.build_channel(
@@ -31,28 +42,48 @@ channel = noise.build_channel(
 """
 
 # impulse magnitude
-impTM = np.linspace(0.1,400,5)
+impTM = np.linspace(0.1,400,100)
 BerTM = []
 for i in impTM:
-
     channel = noise.add_impulse_noise(prob=0.5,magnitude=i)
+    BerTM.append(getBERof(channel))
 
-    signal_after_channel = channel(signal)
+headTM = "impulse magnitude, BER"
+resTM = np.array([impTM, BerTM]).transpose()
+np.savetxt("impulse_magnitude.csv", resTM,delimiter=',',header=headTM, comments='')
 
-    receivedData = Data.bpskDemod(signal_after_channel)
+# multipath attenuations
+attT = np.linspace(0,1,100)
+BerAtt = []
+for i in attT:
+    channel = noise.multipath(delays=[0.001, 0.002], attenutations =[i,i])
+    BerAtt.append(getBERof(channel))
 
-    img = Data()
-    img.setDataFromBin(receivedData)
-    img.saveFile("received_image.jpg")
+headAtt = "multipath attenutations, BER"
+resAtt = np.array([attT, BerAtt]).transpose()
+np.savetxt("impulse_magnitude.csv", resAtt,delimiter=',',header=headAtt, comments='')
 
-    r = img.toBinaryStr()
-    k = BER(sigData,r)
-    BerTM.append(BER(sigData, r))
+# awgn
+snrT = np.linspace(0.001, 10, 100)
+BerSnr = []
+for i in snrT:
+    channel = noise.add_awgn(i)
+    BerSnr.append(getBERof(channel))
 
-print(impTM)
-print(BerTM)
-fig, ax = plt.subplots()
-ax.plot(impTM, BerTM)
-plt.show()
+headSnr = "awgn snr, BER"
+resSnr = np.array([snrT, BerSnr]).transpose()
+np.savetxt("impulse_magnitude.csv", resSnr,delimiter=',',header=headSnr, comments='')
+
+# sin
+sinT = np.linspace(0.1,1000,100)
+BerSin = []
+for i in sinT:
+    channel = noise.add_sinusoidal_interference(freq=1e10, strength=i)
+    BerSin.append(getBERof(channel))
+
+headSin = "sinusoidal strength, BER"
+resSin = np.array([impSin, BerSin]).transpose()
+np.savetxt("impulse_magnitude.csv", resSin,delimiter=',',header=headSin, comments='')
+
 
 
