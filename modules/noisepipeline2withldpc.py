@@ -5,6 +5,8 @@ from pyldpc import make_ldpc, encode, decode, get_message
 import time
 import json 
 import loss
+import data
+
 """INSTEAD OF IMPORTING LDPC_ALGORITHM, GOING TO COPY ALL OF IT HERE """
 
 #start clock and define function to check time
@@ -133,6 +135,7 @@ def ints_to_flat_bits(arr, width=8):
     return [(int(n) >> i) & 1 for n in arr for i in range(width - 1, -1, -1)]
 
 #converts a 1D array of bits to a 1D array of integers
+
 def bits_to_ints(bits, width=8):
     if len(bits) % width != 0:
         raise ValueError(f"Number of bits must be a multiple of {width}")
@@ -170,11 +173,11 @@ def ldpc_encode(arr,G,k=904,return_blocks=False):
 
 
 
-img = Image.open('smalljwphoto.jpeg').convert("RGB") # convert to RGB to ensure we have 3 channels
+img = Image.open('Reimu Hakurei.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
 img_array = np.array(img, dtype=int) 
 original_shape = img_array.shape # store original shape for later
 original_signal = img_array.flatten() # flatten the 3D image array to a 1D signal for processing
-print(f"Original signal shape: {original_signal.shape}")
+print(f"Original signal shape: {img_array}")
 #encoding ldpc algorithm 
 
 flat_signal,binary_arr, original_length,codeword_length  = ldpc_encode(original_signal,G,k=904,return_blocks=True)
@@ -272,20 +275,30 @@ def ldpc_decode(noisy_arr, H,G ,snr, original_length=original_length,codeword_le
 recovered_bits=ldpc_decode(-soft_signal,H,G,snr,original_length,codeword_length,maxiter=500)
 
 print(f"It took {check_time(start)} time to finish ldpc decoding process")
-print(f"recovered_bits shape: {recovered_bits.shape}...")
+
+
+#flatten everything
+recovered_bits=np.array(recovered_bits,dtype=int).flatten()
+binary_arr=np.array(binary_arr,dtype=int).flatten()
+
+
 
 #check ber before converting
-ber= loss.ber(np.array(recovered_bits,dtype=int).flatten(),np.array(binary_arr,dtype=int).flatten())
+ber= loss.ber(recovered_bits,binary_arr)
+
 print("ber:",ber)
+"""NOW FOR IMAGE"""
 
-#change back to integers
+
+#return to integers
 recovered_pixels = bits_to_ints(recovered_bits)
-
 
 # Reshape to original image dimensions
 recovered_array = recovered_pixels.reshape(original_shape)
-
+print(f"recovered_pixels: {recovered_array}...")
 # Save and display
+print("Equal arrays:", np.array_equal(img_array, recovered_array))
+recovered_array = recovered_array.astype(np.uint8)
 corrupted_img = Image.fromarray(recovered_array, mode="RGB")
-corrupted_img.save("corrupted_analogue.jpg")
+corrupted_img.save("corrupted_analogue.png")
 corrupted_img.show()
