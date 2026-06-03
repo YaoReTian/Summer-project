@@ -11,7 +11,7 @@ waveform = lambda t: np.sin(omega * t)
 """
 
 config = {
-    'awgn':          {'snr_db': 20},
+    'awgn':          {'snr': 20},
 
     'impulse':       {'prob': 0.001, 'magnitude': 5},
 
@@ -25,12 +25,11 @@ config = {
 
 }
 
-def add_awgn(snr_db):
+def add_awgn(snr):
     def channel(waveform):
         def noisy_waveform(t):
             x = waveform(t)
             power_signal = np.mean(x**2) # calculating the power of the signal from definition of power for a signal
-            snr = 10**(snr_db/10) # using the SNR formula to change SNR from dB to linear scale
             noise_power = power_signal / snr # calculating the power of the noise using the SNR formula rearranged to find noise power
             noise = np.random.normal(0, np.sqrt(noise_power), np.shape(t)) # generating the gaussian noise with the calculated power
             return x + noise # adding the noise to the original signal to create the noisy signal
@@ -157,4 +156,3 @@ def apply_channel(signal, fs, config):
 
     return s
 """
-
