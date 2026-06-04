@@ -1,7 +1,6 @@
 # Signal Processing module
 
 import numpy as np
-from functools import lru_cache
 
 class Data:
     def __init__(self):
