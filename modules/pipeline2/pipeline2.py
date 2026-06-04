@@ -33,7 +33,7 @@ waveform, Ts, N = make_waveform(flat_signal, sample_rate=sample_rate)
 t = np.linspace(0, N * Ts, N, endpoint=False)
 
 channel1 = noise.build_channel(
-    noise.add_awgn(snr_db=5)
+    noise.add_awgn(snr=5)
 )
 
 channel2 = noise.build_channel(
