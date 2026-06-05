@@ -14,7 +14,8 @@ virtualenv venv
 source venv/bin/activate
 
 python3 -m pip install --upgrade pip
-python3 -m pip install --upgrade pyldpc
+python3 -m pip install numba
+python3 -m pip install --no-build-isolation pyldpc
 python3 noisepipeline2withldpc.py
 
 deactivate
