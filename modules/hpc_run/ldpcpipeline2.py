@@ -174,7 +174,7 @@ def ldpc_encode(arr,G,k=904,return_blocks=False):
 """INSERT IMAGE HERE"""
 
 
-img = Image.open('Reimu Hakurei.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
+img = Image.open('JamesWebbImage1.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
 img_array = np.array(img, dtype=int) 
 original_shape = img_array.shape # store original shape for later
 original_signal = img_array.flatten() # flatten the 3D image array to a 1D signal for processing
