@@ -2,7 +2,6 @@ from Processor import Data
 import numpy as np
 import noise
 import os
-import matplotlib.pyplot as plt
 
 Var = Data()
 Var.setDataFromFile("crippling inkperial.jpg")
@@ -40,7 +39,7 @@ channel = noise.build_channel(
     noise.add_sinusoidal_interference(freq=1e10, strength=0.3)
 )
 """
-
+"""
 # impulse magnitude
 impTM = np.linspace(0.1,400,100)
 BerTM = []
@@ -73,7 +72,7 @@ for i in snrT:
 headSnr = "awgn_snr, BER"
 resSnr = np.array([snrT, BerSnr]).transpose()
 np.savetxt("awgn.csv", resSnr,delimiter=',',header=headSnr, comments='')
-
+"""
 # sin
 sinT = np.linspace(0.1,1000,100)
 BerSin = []
@@ -82,7 +81,7 @@ for i in sinT:
     BerSin.append(getBERof(channel))
 
 headSin = "sinusoidal_strength, BER"
-resSin = np.array([impSin, BerSin]).transpose()
+resSin = np.array([sinT, BerSin]).transpose()
 np.savetxt("sin_strength.csv", resSin,delimiter=',',header=headSin, comments='')
 
 
