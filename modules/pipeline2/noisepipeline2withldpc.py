@@ -5,7 +5,8 @@ from pyldpc import make_ldpc, encode, decode, get_message
 import time
 import json 
 import loss
-import data
+from skimage.metrics import structural_similarity as ssim
+import metrics
 
 """INSTEAD OF IMPORTING LDPC_ALGORITHM, GOING TO COPY ALL OF IT HERE """
 
@@ -170,10 +171,10 @@ def ldpc_encode(arr,G,k=904,return_blocks=False):
     
 
 
+"""INSERT IMAGE HERE"""
 
 
-
-img = Image.open('JamesWebbImage1.jpg.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
+img = Image.open('JamesWebbImage1.jpg').convert("RGB") # convert to RGB to ensure we have 3 channels
 img_array = np.array(img, dtype=int) 
 original_shape = img_array.shape # store original shape for later
 original_signal = img_array.flatten() # flatten the 3D image array to a 1D signal for processing
@@ -191,7 +192,7 @@ def bits_to_analog_levels(bits, low=0.1, high=0.9):
     bits = np.asarray(bits, dtype=np.uint8)
     return np.where(bits == 0, low, high).astype(np.float64)
 
-tx_signal = bits_to_analog_levels(flat_signal, low=0.02, high=0.98)
+tx_signal = bits_to_analog_levels(flat_signal, low=-1, high=1)
 
 
 """
@@ -217,11 +218,11 @@ waveform, Ts, N = make_waveform(tx_signal, sample_rate=sample_rate)
 t = np.linspace(0, N * Ts, N, endpoint=False)
 
 channel1 = noise.build_channel(
-    noise.add_awgn(snr=5)
+    noise.add_awgn(snr=4)
 )
 
 channel2 = noise.build_channel(
-    noise.add_sinusoidal_interference(freq=100, strength=0.2)
+    noise.add_sinusoidal_interference(freq=1000, strength=0.2)
 )
 
 channel3 = noise.build_channel(
@@ -251,9 +252,9 @@ def analog_to_soft(received, low=0.10, high=0.90):
     scale = 2.0 / (high - low)
     return (received - midpoint) * scale
 
-soft_signal = analog_to_soft(received_signal, low=0.02, high=0.98)
+soft_signal = analog_to_soft(received_signal, low=-1, high=1)
 #compute the equivalent so snr can be clearly calculated
-clean_soft_signal = analog_to_soft(tx_signal, low=0.02, high=0.98)
+clean_soft_signal = analog_to_soft(tx_signal, low=-1, high=1)
 print(f"the output soft signal is {soft_signal}")
 print(f"It took {check_time(start)} time to finish noise introduction process")
 
@@ -289,22 +290,28 @@ ber= loss.ber(recovered_bits,binary_arr)
 print("ber:",ber)
 """NOW FOR IMAGE"""
 
-
 #return to integers
 recovered_pixels = bits_to_ints(recovered_bits)
 
 # Reshape to original image dimensions
 recovered_array = recovered_pixels.reshape(original_shape)
 print(f"recovered_pixels: {recovered_array}...")
-# Save and display
+
+#METRICS
+ber,ssim_score,snr,psnr = metrics.metric_pipeline(img_array, recovered_array, clean_soft_signal, soft_signal)
+print(f"ber:{ber}, ssim:{ssim_score}, snr:{snr}, psnr:{psnr}")
+
+
 
 # Save and display
-with open("data.txt", "w") as file:
-    file.write(recovered_array)
-    
+with open("ldpced_noise.txt", "w") as file:
+    json.dump(recovered_array.tolist(), file)
+
+
 
 print("Equal arrays:", np.array_equal(img_array, recovered_array))
 recovered_array = recovered_array.astype(np.uint8)
 corrupted_img = Image.fromarray(recovered_array, mode="RGB")
-corrupted_img.save("corrupted_analogue.png")
+corrupted_img.save("ldpced_output.png")
+corrupted_img.show()
 
