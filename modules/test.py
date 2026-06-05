@@ -61,9 +61,9 @@ for i in attT:
 headAtt = "multipath_attenuations, BER"
 resAtt = np.array([attT, BerAtt]).transpose()
 np.savetxt("multipath_attenuations.csv", resAtt,delimiter=',',header=headAtt, comments='')
-
+"""
 # awgn
-snrT = np.linspace(0.001, 10, 100)
+snrT = np.linspace(0.00001, 1, 100)
 BerSnr = []
 for i in snrT:
     channel = noise.add_awgn(i)
@@ -83,6 +83,7 @@ for i in sinT:
 headSin = "sinusoidal_strength, BER"
 resSin = np.array([sinT, BerSin]).transpose()
 np.savetxt("sin_strength.csv", resSin,delimiter=',',header=headSin, comments='')
+"""
 
 
 
