@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 start = time.time()
 
 def check_time(start):
-    end = time.time()
+    end = time.time()    
     return end - start
 
 
@@ -393,6 +393,7 @@ def plot_16_graphs(all_results):
             ax.grid(True)
 
     plt.tight_layout(rect=[0, 0, 1, 0.97])
+    plt.savefig('noise_analysis_ldpc_big.png', dpi=150, bbox_inches='tight')
     plt.show()
 
 
@@ -400,7 +401,7 @@ def plot_16_graphs(all_results):
 # ORIGINAL IMAGE LOAD SECTION
 # -------------------------------
 
-img = Image.open('JamesWebbImage1.jpg').convert("RGB")
+img = Image.open('Reimu Hakurei.jpg').convert("RGB")
 img_array = np.array(img, dtype=int)
 original_shape = img_array.shape
 original_signal = img_array.flatten()
