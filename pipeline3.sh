@@ -1,6 +1,6 @@
 #!/bin/bash
-#PBS -lwalltime=05:00:00
-#PBS -lselect=1:ncpus=1:mem=16gb
+#PBS -lwalltime=24:00:00
+#PBS -lselect=1:ncpus=1:mem=64gb
 #PBS -N metricPipeline
 
 module load Pillow/11.3.0-GCCcore-14.3.0
