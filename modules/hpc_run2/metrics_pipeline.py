@@ -401,7 +401,7 @@ def plot_16_graphs(all_results):
 # ORIGINAL IMAGE LOAD SECTION
 # -------------------------------
 
-img = Image.open('JamesWebbImage1.jpg').convert("RGB")
+img = Image.open('smalljwphoto.jpg').convert("RGB")
 img_array = np.array(img, dtype=int)
 original_shape = img_array.shape
 original_signal = img_array.flatten()
