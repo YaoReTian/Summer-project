@@ -1,0 +1,5 @@
+/rds/general/user/mty25/home/Summer-project/modules/hpc_run2/venv/lib/python3.13/site-packages/pyldpc/decoder.py:62: UserWarning: Decoding stopped before convergence. You may want
+                       to increase maxiter
+  warnings.warn("""Decoding stopped before convergence. You may want
+/rds/general/user/mty25/home/Summer-project/modules/hpc_run2/metrics_pipeline.py:438: DeprecationWarning: 'mode' parameter is deprecated and will be removed in Pillow 13 (2026-10-15)
+  corrupted_img = Image.fromarray(recovered_array_uint8, mode="RGB")
